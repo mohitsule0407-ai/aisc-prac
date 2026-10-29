@@ -2,24 +2,28 @@ Aim: Implement adversarial search using min-max algorithm.
 
 
 import math
-# Minimax function for a game tree
+
 def minimax(depth, node_index, is_max, scores, height):
-    # If we reach a leaf node, return its score
-    if depth == height:
-        return scores[node_index]
-    if is_max:  # Maximizer&#39;s move
-        return max(
-            minimax(depth + 1, node_index * 2, False, scores, height),
-            minimax(depth + 1, node_index * 2 + 1, False, scores, height)
-        )
-    else:  # Minimizer&#39;s move
-        return min(
-            minimax(depth + 1, node_index * 2, True, scores, height),
-            minimax(depth + 1, node_index * 2 + 1, True, scores, height)
-        )
-# Example game tree (leaf scores)
+
+    if depth == height:
+        return scores[node_index]
+
+    if is_max:  
+        return max(
+            minimax(depth + 1, node_index * 2, False, scores, height),
+            minimax(depth + 1, node_index * 2 + 1, False, scores, height)
+        )
+    else:  
+        return min(
+            minimax(depth + 1, node_index * 2, True, scores, height),
+            minimax(depth + 1, node_index * 2 + 1, True, scores, height)
+        )
+
+
 scores = [3, 5, 6, 9, 1, 2, 0, -1]
-# Tree height = log2(len(scores))
+
 height = int(math.log2(len(scores)))
+
 best_score = minimax(0, 0, True, scores, height)
-print(&quot;The optimal value is:&quot;, best_score)
+
+print("The optimal value is:", best_score)
