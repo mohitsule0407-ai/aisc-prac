@@ -1,69 +1,76 @@
 A* algorithm:-
 
 def astar(start, goal):
-    open_set = {start}
-    closed_set = set()
-    g = {start: 0}
-    parents = {start: None}
+    open_set = {start}
+    closed_set = set()
+    g = {start: 0}
+    parents = {start: None}
 
-    while open_set:
-        current = min(open_set, key=lambda x: g[x] +
-heuristic(x))
+    while open_set:
+        current = min(
+            open_set,
+            key=lambda x: g[x] + heuristic(x)
+        )
 
-        if current == goal:
-            path = []
-            while current:
-                path.append(current)
-                current = parents[current]
-            path.reverse()
+        if current == goal:
+            path = []
+            node = current
 
-            print(&quot;Shortest path:&quot;, path)
-            print(&quot;Total cost:&quot;, g[goal])
-            return
+            while node is not None:
+                path.append(node)
+                node = parents[node]
 
-        open_set.remove(current)
-        closed_set.add(current)
+            path.reverse()
 
-        neighbors = graph.get(current, [])
-        for neighbor, cost in neighbors:
-            if neighbor in closed_set:
-                continue
+            print("Shortest path:", path)
+            print("Total cost:", g[goal])
+            return
 
-            new_cost = g[current] + cost
-            if neighbor not in open_set or new_cost &lt;
-g.get(neighbor, float(&#39;inf&#39;)):
-                g[neighbor] = new_cost
-                parents[neighbor] = current
-                open_set.add(neighbor)
+        open_set.remove(current)
+        closed_set.add(current)
 
-    print(&quot;No path found.&quot;)
+        neighbors = graph.get(current, [])
+
+        for neighbor, cost in neighbors:
+            if neighbor in closed_set:
+                continue
+
+            new_cost = g[current] + cost
+
+            if (neighbor not in open_set or
+                    new_cost < g.get(neighbor, float('inf'))):
+                g[neighbor] = new_cost
+                parents[neighbor] = current
+                open_set.add(neighbor)
+
+    print("No path found.")
+
 
 # Heuristic values (estimated cost to goal)
 def heuristic(node):
-    h = {
-        &#39;A&#39;: 11,
-        &#39;B&#39;: 6,
-        &#39;C&#39;: 99,
-        &#39;D&#39;: 1,
-        &#39;E&#39;: 7,
-        &#39;G&#39;: 0,
-    }
-    return h.get(node, float(&#39;inf&#39;))
+    h = {
+        'A': 11,
+        'B': 6,
+        'C': 99,
+        'D': 1,
+        'E': 7,
+        'G': 0
+    }
+    return h.get(node, float('inf'))
+
 
 # Graph definition
 graph = {
-    &#39;A&#39;: [(&#39;B&#39;, 2), (&#39;E&#39;, 3)],
-    &#39;B&#39;: [(&#39;C&#39;, 1), (&#39;G&#39;, 9)],
-    &#39;C&#39;: [],
-
-    &#39;E&#39;: [(&#39;D&#39;, 6)],
-    &#39;D&#39;: [(&#39;G&#39;, 1)],
+    'A': [('B', 2), ('E', 3)],
+    'B': [('C', 1), ('G', 9)],
+    'C': [],
+    'E': [('D', 6)],
+    'D': [('G', 1)],
+    'G': []
 }
 
 # Run the search
-astar(&#39;A&#39;, &#39;G&#39;)
-
-
+astar('A', 'G')
 
 
 
@@ -73,90 +80,96 @@ astar(&#39;A&#39;, &#39;G&#39;)
 
 A*algorithm for 8 puzzle problem:-
 
+
 def h(state, goal):
-# Manhattan distance
-distance = 0
+    # Manhattan distance
+    distance = 0
 
-for i in range(9):
-if state[i] != 0:
-j = goal.index(state[i])
+    for i in range(9):
+        if state[i] != 0:
+            j = goal.index(state[i])
+            distance += abs(i // 3 - j // 3)
+            distance += abs(i % 3 - j % 3)
 
-distance += abs(i // 3 - j // 3)
-distance += abs(i % 3 - j % 3)
+    return distance
 
-return distance
 
 def get_neighbors(state):
-neighbors = []
+    neighbors = []
 
-zero = state.index(0)
-row = zero // 3
-col = zero % 3
+    zero = state.index(0)
+    row = zero // 3
+    col = zero % 3
 
-moves = [(-1,0), (1,0), (0,-1), (0,1)]
+    moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-for dr, dc in moves:
-r = row + dr
-c = col + dc
+    for dr, dc in moves:
+        r = row + dr
+        c = col + dc
 
-if 0 &lt;= r &lt; 3 and 0 &lt;= c &lt; 3:
-new = state[:]
-new_zero = r * 3 + c
+        if 0 <= r < 3 and 0 <= c < 3:
+            new = state[:]
+            new_zero = r * 3 + c
 
-new[zero], new[new_zero] = new[new_zero], new[zero]
+            new[zero], new[new_zero] = new[new_zero], new[zero]
+            neighbors.append(new)
 
-neighbors.append(new)
+    return neighbors
 
-return neighbors
 
 def astar(start, goal):
+    open_list = [(h(start, goal), 0, start, [start])]
+    best_g = {tuple(start): 0}
 
-open_list = [(h(start, goal), 0, start, [start])]
-visited = []
+    while open_list:
+        open_list.sort(key=lambda x: x[0])
+        f, g, state, path = open_list.pop(0)
 
-while open_list:
+        if state == goal:
+            return path
 
-# Choose state with smallest f = g + h
-open_list.sort()
-f, g, state, path = open_list.pop(0)
+        if g > best_g.get(tuple(state), float('inf')):
+            continue
 
-if state == goal:
-return path
+        for neighbor in get_neighbors(state):
+            new_g = g + 1
+            key = tuple(neighbor)
 
-if state in visited:
-continue
+            if new_g < best_g.get(key, float('inf')):
+                best_g[key] = new_g
+                new_f = new_g + h(neighbor, goal)
 
-visited.append(state)
+                open_list.append(
+                    (new_f, new_g, neighbor, path + [neighbor])
+                )
 
-for neighbor in get_neighbors(state):
+    return None
 
-if neighbor not in visited:
-
-new_g = g + 1
-new_f = new_g + h(neighbor, goal)
-
-open_list.append(
-(new_f, new_g, neighbor, path + [neighbor])
-)
-
-return None
 
 # Initial state
-start = [1, 2, 3,
-4, 0, 6,
-7, 5, 8]
+start = [
+    1, 2, 3,
+    4, 0, 6,
+    7, 5, 8
+]
 
 # Goal state
-goal = [1, 2, 3,
-4, 5, 6,
-7, 8, 0]
+goal = [
+    1, 2, 3,
+    4, 5, 6,
+    7, 8, 0
+]
 
 path = astar(start, goal)
 
 # Print solution
-for step in path:
+if path:
+    print("Solution found in", len(path) - 1, "moves:\n")
 
-print(step[0:3])
-print(step[3:6])
-print(step[6:9])
-print()
+    for step in path:
+        print(step[0:3])
+        print(step[3:6])
+        print(step[6:9])
+        print()
+else:
+    print("No solution found.")
