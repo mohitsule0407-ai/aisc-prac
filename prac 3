@@ -1,0 +1,82 @@
+Depth-First Search (DFS):-
+
+def dfs(graph, start, goal):
+    stack = [[start]] # Stack stores paths
+    visited = set()
+   
+    while stack:
+        path = stack.pop() # Pop the last path (LIFO)
+        node = path[-1]
+       
+        if node == goal:
+            return path
+       
+        if node not in visited:
+            visited.add(node) # Explore neighbors in reverse order to
+simulate standard DFS behavior
+            # (or process in forward order if you want the first neighbor
+to be explored last from the stack)
+            for neighbor in reversed(graph.get(node, [])):
+                if neighbor not in visited:
+                    stack.append(path + [neighbor])
+    return None
+   
+graph = {
+          &#39;A&#39;: [&#39;B&#39;, &#39;C&#39;],
+          &#39;B&#39;: [&#39;D&#39;, &#39;E&#39;],
+          &#39;C&#39;: [&#39;F&#39;],
+          &#39;D&#39;: [],
+          &#39;E&#39;: [&#39;F&#39;],
+          &#39;F&#39;: [] }
+start_node_dfs = &#39;A&#39;
+goal_node_dfs = &#39;F&#39;
+path_dfs = dfs(graph, start_node_dfs, goal_node_dfs)
+if path_dfs:
+    print(f&quot;Path from {start_node_dfs} to {goal_node_dfs} (DFS):
+{path_dfs}&quot;)
+else:
+    print(f&quot;No path found from {start_node_dfs} to {goal_node_dfs}
+(DFS).&quot;)
+
+
+
+
+
+
+
+
+
+Breadth-First Search (BFS):-
+
+from collections import deque
+def bfs(graph, start, goal):
+    queue = deque([[start]])
+    visited = set([start])
+   
+    while queue:
+        path = queue.popleft()
+        node = path[-1]
+       
+        if node == goal:
+            return path
+           
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(path + [neighbor])
+    return None
+graph = {
+    &#39;A&#39;: [&#39;B&#39;, &#39;C&#39;],
+    &#39;B&#39;: [&#39;D&#39;, &#39;E&#39;],
+    &#39;C&#39;: [&#39;F&#39;],
+    &#39;D&#39;: [],
+    &#39;E&#39;: [&#39;F&#39;],
+    &#39;F&#39;: []
+}
+start_node = &#39;A&#39;
+goal_node = &#39;F&#39;
+path = bfs(graph, start_node, goal_node)
+if path:
+    print(f&quot;Shortest path from {start_node} to {goal_node}: {path}&quot;)
+else:
+    print(f&quot;No path found from {start_node} to {goal_node}.&quot;)
